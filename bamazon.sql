@@ -10,7 +10,15 @@ CREATE TABLE products (
   department_name VARCHAR(50),
   price DECIMAL(10,2),
   stock_quantity INT(10),
+  product_sales DECIMAL(10,2),
   PRIMARY KEY (item_id)
+);
+
+CREATE TABLE departments (
+  department_id INT NOT NULL AUTO_INCREMENT,
+  department_name VARCHAR(50),
+  overhead_costs DECIMAL(10,2),
+  PRIMARY KEY (department_id)
 );
 
 INSERT INTO products (product_name, department_name, price, stock_quantity)
@@ -25,5 +33,14 @@ VALUES
   ("AM - Arctic Monkeys - Audio CD", "Music", 8.99, 15),
   ("Beats Studio3 Wireless Over-Ear Headphones - Matte Black", "Electronics", 349.95, 30),
   ("New Microsoft Surface Go (Intel Pentium Gold, 8GB RAM, 128GB)", "Electronics", 499.00, 30);
+  
+INSERT INTO departments (department_name, overhead_costs)
+VALUES
+  ("Musical Instruments", 5000),
+  ("Video Games", 2500),
+  ("Books", 1000),
+  ("Music", 1000),
+  ("Electronics", 20000);
 
 SELECT * FROM products;
+SELECT * FROM departments;
