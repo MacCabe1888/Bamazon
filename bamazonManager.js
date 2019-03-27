@@ -52,6 +52,8 @@ function view(filter) {
     for (let i = 0; i < res.length; i++) {
       if (res[i].price % 1 === 0) {
         priceArr.push(`$${res[i].price}.00`);
+      } else if ((10 * res[i].price) % 1 === 0) {
+        priceArr.push(`$${res[i].price}0`);
       } else {
         priceArr.push(`$${res[i].price}`);
       }
