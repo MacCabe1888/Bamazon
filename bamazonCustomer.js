@@ -21,6 +21,8 @@ function displayItems() {
     for (let i = 0; i < res.length; i++) {
       if (res[i].price % 1 === 0) {
         priceArr.push(`$${res[i].price}.00`);
+      } else if ((10 * res[i].price) % 1 === 0) {
+        priceArr.push(`$${res[i].price}0`);
       } else {
         priceArr.push(`$${res[i].price}`);
       }
@@ -110,9 +112,20 @@ function customerPrompt(res) {
                   function(err, res) {
                     if (err) throw err;
                     let unitPrice = res[0].price;
-                    let totalCost = orderQuantity * unitPrice;
+                    // The total cost of the user's purchase is equal to the number of units ordered times the price per unit. Multiplying and then dividing by 100 ensures that the operations are performed on integers, thus avoiding the potential imprecision of floating-point operations.
+                    let totalCost = (100 * orderQuantity * unitPrice) / 100;
+                    connection.query(`UPDATE products SET product_sales = product_sales + ${totalCost} WHERE ?`,
+                      {
+                        item_id: id
+                      },
+                      function(err) {
+                        if (err) throw err;
+                      }
+                    );
                     if (totalCost % 1 === 0) {
                       totalCost = `$${totalCost}.00`;
+                    } else if ((10 * totalCost) % 1 === 0) {
+                      totalCost = `$${totalCost}0`;
                     } else {
                       totalCost = `$${totalCost}`;
                     }
