@@ -38,8 +38,8 @@ function customerPrompt(res) {
   let id = null;
   let name = null;
   let idChoices = [];
-  for (i = 1; i <= res.length; i++) {
-    idChoices.push(`${i}`);
+  for (i = 0; i < res.length; i++) {
+    idChoices.push(`${res[i].item_id}`);
   }
   inquirer
     .prompt([
@@ -72,18 +72,33 @@ function customerPrompt(res) {
               let supply = res[0].stock_quantity;
               if (orderQuantity > supply) {
                 if (supply === 0) {
-                  console.log(`Unfortunately, we are out of stock of "${name}." Would you like to order something else?`);
+                  inquirer
+                    .prompt([
+                      {
+                        type: "confirm",
+                        name: "resetDisplay",
+                        message: `Unfortunately, we are out of stock of "${name}." Would you like to order something else?`,
+                        default: false
+                      }
+                    ]).then(function(inquirerResponse) {
+                      if (inquirerResponse.resetDisplay === true) {
+                        displayItems();
+                      } else {
+                        connection.end();
+                      }
+                    })
                 } else if (supply === 1) {
                   console.log(`Unfortunately, we have but one unit of "${name}" remaining in stock. Please try your order again.`);
+                  displayItems();
                 } else {
                   console.log(`Unfortunately, we have only ${supply} units of "${name}" remaining in stock. Please try your order again.`);
+                  displayItems();
                 }
-                displayItems();
               } else {
                 connection.query("UPDATE products SET stock_quantity = stock_quantity - " + orderQuantity + " WHERE ?",
-                    {
-                      item_id: id
-                    },
+                  {
+                    item_id: id
+                  },
                   function(err) {
                     if (err) throw err;
                   }
