@@ -120,33 +120,41 @@ function restock() {
 
 function newProduct() {
   console.log();
-  inquirer
-    .prompt([
-      {
-        type: "input",
-        name: "itemName",
-        message: "Please enter the name of the new product you would like to add:"
-      },
-      {
-        type: "input",
-        name: "department",
-        message: "Please enter the department of the new product you would like to add:"
-      },
-      {
-        type: "input",
-        name: "price",
-        message: "Please enter the price of the new product you would like to add:"
-      },
-      {
-        type: "input",
-        name: "quantity",
-        message: "Please enter the starting quantity of the new product you would like to add:"
-      }
-    ]).then(function(inquirerResponse) {
-      connection.query(`INSERT INTO products (product_name, department_name, price, stock_quantity) VALUES ("${inquirerResponse.itemName}", "${inquirerResponse.department}", ${inquirerResponse.price}, ${inquirerResponse.quantity})`, function (err) {
-        if(err) throw err;
-        console.log(`\nNew item "${inquirerResponse.itemName}" was successfully added!`);
-        displayMenu();
+  connection.query("SELECT department_name FROM departments", function(err, res) {
+    if (err) throw err;
+    let deptChoices = [];
+    for (i = 0; i < res.length; i++) {
+      deptChoices.push(res[i].department_name);
+    }
+    inquirer
+      .prompt([
+        {
+          type: "input",
+          name: "itemName",
+          message: "Please enter the name of the new product you would like to add:"
+        },
+        {
+          type: "list",
+          name: "department",
+          message: "Please select the most appropriate department for the new product:",
+          choices: deptChoices
+        },
+        {
+          type: "input",
+          name: "price",
+          message: "Please enter the price of the new product:"
+        },
+        {
+          type: "input",
+          name: "quantity",
+          message: "Please enter the starting quantity of the new product:"
+        }
+      ]).then(function(inquirerResponse) {
+        connection.query(`INSERT INTO products (product_name, department_name, price, stock_quantity) VALUES ("${inquirerResponse.itemName}", "${inquirerResponse.department}", ${inquirerResponse.price}, ${inquirerResponse.quantity})`, function (err) {
+          if(err) throw err;
+          console.log(`\nNew item "${inquirerResponse.itemName}" was successfully added!`);
+          displayMenu();
+        });
       });
-    });
+  });
 }
